@@ -1,8 +1,4 @@
 <?php
-
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
 
