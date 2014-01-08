@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 define('_JEXEC', 1);
 define('DS', DIRECTORY_SEPARATOR);
 
@@ -10,7 +13,7 @@ if (file_exists(dirname(__FILE__) . '/defines.php'))
 
 if (!defined('_JDEFINES')) 
 {
-    define('JPATH_BASE', dirname(__FILE__));
+    define('JPATH_BASE', dirname(__FILE__) . '/../../..');
     require_once JPATH_BASE.'/includes/defines.php';
 }
 
@@ -43,10 +46,15 @@ $task = JRequest::getVar('task', '');
 switch($task) 
 {
   case 'status':
-
+    $options = array(
+      'z' => $params->get('site', '')
+    ); 
+    $result = curlCall('zone_settings', $options, $params);
+    header('Content-Type: application/json');
+    echo $result;
   break;
 
-  case: 'change':
+  case 'change':
     $mode = JRequest::getVar('mode', '0');
     $options = array(
       'v' => $mode,
@@ -61,7 +69,7 @@ switch($task)
 function curlCall($action, $options = array(), $params)
 {
   $token = $params->get('token', '');
-  $email = $params->get('token', '');
+  $email = $params->get('email', '');
   $url = 'https://www.cloudflare.com/api_json.html';
 
   $data = array(
@@ -71,7 +79,6 @@ function curlCall($action, $options = array(), $params)
   );
 
   $data = array_merge($data, $options);
-  
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
   curl_setopt($ch, CURLOPT_MAXREDIRS, 10 );
@@ -81,6 +88,5 @@ function curlCall($action, $options = array(), $params)
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $output = curl_exec($ch);
   curl_close($ch);
-  $decoded = json_decode($output);
-  return $decoded;
+  return $output;
 }
