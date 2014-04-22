@@ -4,7 +4,7 @@ defined('_JEXEC') or die;
 ?>
 <style type="text/css">
   .cf-dev {
-    float: left; 
+    float: left;
     margin-right: 20px;
   }
   .cf-status-on {
@@ -23,15 +23,19 @@ defined('_JEXEC') or die;
 
   var cfStatus = 0;
 
-  function getCFStatus() {  
+  function getCFStatus() {
     var result = new Request.JSON({
-      method: "get", 
+      method: "get",
       url: "modules/mod_cloudflaredev/ajax.php?task=status",
       onSuccess: function(data){
         if(data.result != 'success') {
           $('cf-dev-error').set('html', data.msg);
         } else {
           var status = data.response.result.objs[0].dev_mode;
+          var now = Math.round(new Date().getTime() / 1000);
+          if(status > 0 && status < now) {
+            status = 0;
+          }
           cfStatus = status;
           $('cf-dev-change').set('disabled', false);
           if(status) {
@@ -46,7 +50,7 @@ defined('_JEXEC') or die;
               .addClass('cf-status-off');
           }
         }
-        
+
       }
     }).get();
   }
@@ -54,7 +58,7 @@ defined('_JEXEC') or die;
   function changeCFStatus() {
     var mode = (cfStatus) ? '0' : '1';
     var result = new Request.JSON({
-      method: "get", 
+      method: "get",
       url: "modules/mod_cloudflaredev/ajax.php?task=change&mode=" + mode,
       onSuccess: function(data){
         if(data.result != 'success') {
@@ -74,7 +78,7 @@ defined('_JEXEC') or die;
               .addClass('cf-status-off');
           }
         }
-        
+
       }
     }).get();
   }
